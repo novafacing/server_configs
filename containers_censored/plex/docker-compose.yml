@@ -1,0 +1,16 @@
+version: '2'
+services:
+  plex:
+    container_name: plex
+    image: plexinc/pms-docker
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - TZ=%YOUR_TZ_HERE%
+    volumes:
+      - %YOUR_CONFIGS_ROOT%/plex/config:/config
+      - %YOUR_CONFIGS_ROOT%/plex/transcode:/transcode
+      - %YOUR_CONFIGS_ROOT%/plex/data:/data
+      - %YOUR_STORAGE_ROOT%/Movies:/data/movies
+      - %YOUR_STORAGE_ROOT%/TV:/data/tv
+      - %YOUR_STORAGE_ROOT%/Transmission-Downloads:/data/downloads

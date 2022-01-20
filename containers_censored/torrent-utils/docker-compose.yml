@@ -1,0 +1,93 @@
+version: "2.1"
+services:
+  jackett:
+    image: ghcr.io/linuxserver/jackett
+    container_name: jackett
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=%YOUR_TZ_HERE%
+      - AUTO_UPDATE=true #optional
+    volumes:
+      - %YOUR_CONFIGS_ROOT%/jackett/config:/config
+      - %YOUR_CONFIGS_ROOT%/jackett/downloads:/downloads
+    ports:
+      - 9117:9117
+    restart: unless-stopped
+    links:
+      - "transmission-openvpn"
+
+  radarr:
+    image: ghcr.io/linuxserver/radarr
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=%YOUR_TZ_HERE%
+    volumes:
+      - %YOUR_CONFIGS_ROOT%/radarr:/config
+      - %YOUR_STORAGE_ROOT%/Movies:/movies #optional
+      # - /path/to/downloadclient-downloads:/downloads #optional
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+    links:
+      - "transmission-openvpn"
+
+  sonarr:
+    image: ghcr.io/linuxserver/sonarr
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=%YOUR_TZ_HERE%
+    volumes:
+      - %YOUR_CONFIGS_ROOT%/sonarr:/config
+      - %YOUR_STORAGE_ROOT%/TV:/tv #optional
+      # - /path/to/downloadclient-downloads:/downloads #optional
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+    links:
+      - "transmission-openvpn"
+
+  readarr:
+    image: ghcr.io/linuxserver/readarr:nightly
+    container_name: readarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=%YOUR_TZ_HERE%
+    volumes:
+      - %YOUR_CONFIGS_ROOT%/readarr:/config
+      - %YOUR_STORAGE_ROOT%/Books/files:/books #optional
+      # - /path/to/downloadclient-downloads:/downloads #optional
+    ports:
+      - 8787:8787
+    restart: unless-stopped
+    links:
+      - "transmission-openvpn"
+
+  transmission-openvpn:
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - "net.ipv6.conf.all.disable_ipv6=0"
+    volumes:
+      - %YOUR_STORAGE_ROOT%/Transmission-Downloads:/data
+      - %YOUR_VPN_CONFIGS_ROOT%/mullvad_config_linux_XX_XXX/:/etc/openvpn/custom
+      - %YOUR_STORAGE_ROOT%/Movies:/data/completed/movies
+      - %YOUR_STORAGE_ROOT%/TV:/data/completed/tv
+    environment:
+      - OPENVPN_PROVIDER=custom
+      - OPENVPN_CONFIG=mullvad_XX_XXX
+      - OPENVPN_USERNAME=%YOUR_MULLVAD_USERNAME_HERE%
+      - OPENVPN_PASSWORD=%YOUR_MULLVAD_PASSWORD_HERE% # probably 'm'
+      - LOCAL_NETWORK=192.168.11.0/24,172.26.0.2/16
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    ports:
+      - "9091:9091"
+    image: haugene/transmission-openvpn
