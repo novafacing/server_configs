@@ -1,0 +1,13 @@
+[Unit]
+Description=Unifi
+After=network.target
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=30
+ExecStart=/usr/local/bin/docker-compose up
+WorkingDirectory=%SERVER_CONFIG_DIR%/containers/unifi
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,13 @@
+[Unit]
+Description=The Lounge
+After=network.target
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=30
+ExecStart=/usr/local/bin/docker-compose up
+WorkingDirectory=%SERVER_CONFIG_DIR%/containers/gitea
+
+[Install]
+WantedBy=multi-user.target
