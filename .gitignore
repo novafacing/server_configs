@@ -1,2 +1,3 @@
 configs/mullvad*
 containers/*
+volumes/*
